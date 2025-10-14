@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 void main() {
   runApp(const MyApp());
@@ -40,9 +41,27 @@ class _BluetoothPageState extends State<BluetoothPage> {
 
   Future<void> initBluetooth() async {
     try {
+      // Solicitar permissões Bluetooth (Android 12+)
+      Map<Permission, PermissionStatus> statuses = await [
+        Permission.bluetoothScan,
+        Permission.bluetoothConnect,
+        Permission.location,
+      ].request();
+
+      // Verificar se todas as permissões foram concedidas
+      bool allGranted = statuses.values.every((status) => status.isGranted);
+      
+      if (!allGranted) {
+        setState(() => status = "Permissões negadas. Ative-as nas configurações.");
+        return;
+      }
+
       // Descobrir dispositivos emparelhados
       List<BluetoothDevice> devices =
           await FlutterBluetoothSerial.instance.getBondedDevices();
+
+      debugPrint("fasfsafasfas");
+      debugPrint(devices.toString());
 
       debugPrint('fasfas');
 
